@@ -34,30 +34,46 @@ function publish(url) {
 }
 
 const dashboard = spawn(process.execPath, [path.join(ROOT, "outreach.mjs"), "ui", "--port", String(PORT)], { stdio: "inherit" });
-const tunnel = spawn(CLOUDFLARED, ["tunnel", "--url", `http://127.0.0.1:${PORT}`], { stdio: ["ignore", "ignore", "pipe"] });
 
-let published = false;
-tunnel.stderr.on("data", (chunk) => {
-  const url = String(chunk).match(/https:\/\/[a-z0-9-]+\.trycloudflare\.com/)?.[0];
-  if (!url || published) return;
-  published = true;
-  try {
-    publish(url);
-    console.log(`\nLive in about a minute: ${SITE}`);
-    console.log(password ? `Username: anything    Password: ${password}\n` : "No password set: anyone with the address can use it.\n");
-  } catch (err) {
-    console.log(`\nCould not push the tunnel address to GitHub: ${String(err.stderr || err.message).trim()}`);
-  }
-});
-tunnel.on("error", () => console.log("Could not start cloudflared. Install it with: winget install Cloudflare.cloudflared"));
+// Cloudflare's free tunnel service sometimes times out or drops, so the tunnel is restarted
+// (and its new address published) whenever it stops.
+let tunnel;
+let closing = false;
+function startTunnel() {
+  let published = false;
+  tunnel = spawn(CLOUDFLARED, ["tunnel", "--url", `http://127.0.0.1:${PORT}`], { stdio: ["ignore", "ignore", "pipe"] });
+  tunnel.stderr.on("data", (chunk) => {
+    // the tunnel's own address is a multi-word name; api.trycloudflare.com only shows up in errors
+    const url = String(chunk).match(/https:\/\/[a-z0-9]+(?:-[a-z0-9]+)+\.trycloudflare\.com/)?.[0];
+    if (!url || published) return;
+    published = true;
+    try {
+      publish(url);
+      console.log(`\nLive in about a minute: ${SITE}`);
+      console.log(password ? `Username: anything    Password: ${password}\n` : "No password set: anyone with the address can use it.\n");
+    } catch (err) {
+      console.log(`\nCould not push the tunnel address to GitHub: ${String(err.stderr || err.message).trim()}`);
+    }
+  });
+  tunnel.on("error", () => {
+    closing = true;
+    console.log("Could not start cloudflared. Install it with: winget install Cloudflare.cloudflared");
+  });
+  tunnel.on("exit", () => {
+    if (closing) return;
+    console.log("The tunnel is not connected; trying again in 15 seconds...");
+    setTimeout(startTunnel, 15000);
+  });
+}
+startTunnel();
 
-const shutdown = () => {
+process.on("SIGINT", () => {
+  closing = true;
   tunnel.kill();
   dashboard.kill("SIGINT");
-};
-process.on("SIGINT", shutdown);
+});
 dashboard.on("exit", () => {
+  closing = true;
   tunnel.kill();
   process.exit(0);
 });
-tunnel.on("exit", () => console.log("The tunnel stopped; the pages.dev address is offline until you run this again."));
