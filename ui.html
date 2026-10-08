@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instagram Outreach</title>
+<style>
+  :root {
+    --bg: #f4f5f8; --card: #ffffff; --line: #e4e6ec; --text: #171a21; --muted: #6b7180;
+    --accent: #5b4bdb; --accent-soft: #ecebfd; --good: #12805c; --good-soft: #dff5ec;
+    --bad: #c4314b; --bad-soft: #fde4e8; --warn-soft: #fff1d6; --warn: #8a5a00;
+    --log-bg: #12141a; --log-text: #c9d1e0; --shadow: 0 1px 2px rgba(20, 24, 40, .06), 0 4px 16px rgba(20, 24, 40, .05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1116; --card: #181b23; --line: #272b37; --text: #e9ebf1; --muted: #8f96a8;
+      --accent: #8b7ff5; --accent-soft: #25224a; --good: #4fd1a1; --good-soft: #133227;
+      --bad: #ff7d92; --bad-soft: #3a1820; --warn-soft: #3a2c10; --warn: #f2c063;
+      --log-bg: #0b0d11; --log-text: #b9c2d3; --shadow: none;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 "Segoe UI", system-ui, sans-serif; }
+  button, input, textarea { font: inherit; color: inherit; }
+  header { display: flex; align-items: center; gap: 12px; padding: 14px 24px; background: var(--card); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; }
+  .logo { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, #f9a03f, #e1306c 55%, #5b4bdb); display: grid; place-items: center; color: #fff; font-weight: 700; }
+  header h1 { font-size: 16px; margin: 0; flex: 1; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--bad-soft); color: var(--bad); }
+  .pill.on { background: var(--good-soft); color: var(--good); }
+  .pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  main { max-width: 1400px; margin: 0 auto; padding: 20px 24px 60px; display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 980px) { main { grid-template-columns: minmax(0, 1fr); padding: 16px; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); padding: 18px; }
+  .stack { display: grid; gap: 16px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 12px; }
+  label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin: 12px 0 5px; }
+  input[type=text], input[type=number], input[type=search], textarea { width: 100%; padding: 8px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--bg); outline: none; }
+  input:focus, textarea:focus { border-color: var(--accent); }
+  textarea { min-height: 150px; resize: vertical; font-size: 13px; }
+  .btn { border: 0; border-radius: 9px; padding: 9px 16px; font-weight: 600; cursor: pointer; background: var(--accent); color: #fff; }
+  .btn:hover { filter: brightness(1.08); }
+  .btn:disabled { opacity: .45; cursor: default; filter: none; }
+  .btn.ghost { background: var(--accent-soft); color: var(--accent); }
+  .btn.danger { background: var(--bad); }
+  .btn.small { padding: 4px 10px; font-size: 12px; border-radius: 7px; }
+  .btn.wide { width: 100%; margin-top: 14px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px; border: 1px solid var(--line); border-radius: 9px; background: var(--bg); }
+  .chips input { flex: 1; min-width: 90px; border: 0; background: none; padding: 3px 5px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 4px 3px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 600; font-size: 13px; }
+  .chip button { border: 0; background: none; cursor: pointer; color: inherit; font-size: 15px; line-height: 1; padding: 0 5px; }
+  select { width: 100%; padding: 8px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--bg); color: inherit; font: inherit; outline: none; }
+  select:focus { border-color: var(--accent); }
+  .sugg { display: flex; flex-wrap: wrap; gap: 6px; }
+  .sugg button { border: 1px solid var(--line); background: none; border-radius: 999px; padding: 3px 11px; cursor: pointer; font-size: 13px; }
+  .sugg button:hover { border-color: var(--accent); }
+  .sugg button.on { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .chips:empty::before { content: "None yet"; color: var(--muted); font-size: 13px; padding: 3px 5px; }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .hint { color: var(--muted); font-size: 12px; margin-top: 6px; }
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .stat { padding: 14px 16px; }
+  .stat b { display: block; font-size: 24px; line-height: 1.2; }
+  .stat span { color: var(--muted); font-size: 12px; }
+  .bar { height: 5px; border-radius: 3px; background: var(--line); margin-top: 8px; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+  .jobhead { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .jobhead span { flex: 1; font-weight: 600; }
+  .spin { width: 14px; height: 14px; border: 2px solid var(--accent-soft); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  pre { margin: 0; background: var(--log-bg); color: var(--log-text); border-radius: 10px; padding: 12px; height: 230px; overflow: auto; white-space: pre-wrap; word-break: break-word; font: 12px/1.55 Consolas, monospace; }
+  .preview { margin-top: 12px; padding: 12px; border-radius: 10px; background: var(--accent-soft); white-space: pre-wrap; font-size: 13px; }
+  .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+  .tabs { display: flex; gap: 4px; background: var(--bg); padding: 4px; border-radius: 10px; flex-wrap: wrap; }
+  .tabs button { border: 0; background: none; padding: 6px 12px; border-radius: 7px; cursor: pointer; font-weight: 600; color: var(--muted); }
+  .tabs button.on { background: var(--card); color: var(--text); box-shadow: var(--shadow); }
+  .toolbar input { max-width: 240px; }
+  .toolbar select { width: auto; margin-left: auto; }
+  .bulk { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 12px; margin-bottom: 12px; border-radius: 10px; background: var(--accent-soft); }
+  .bulk b { margin-right: 6px; }
+  .bulk .btn.ghost { background: var(--card); }
+  .bulk[hidden] { display: none; }
+  td:nth-child(n+3) { white-space: nowrap; }
+  .sub { max-width: 220px; }
+  td:nth-child(5) .sub { max-width: 140px; }
+  .acct { min-width: 0; }
+  tr.group td { background: var(--bg); font-weight: 700; text-transform: capitalize; padding: 8px 10px; }
+  td input[type=checkbox], th input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; }
+  .tablewrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  tr:last-child td { border-bottom: 0; }
+  .acct { display: flex; align-items: center; gap: 10px; min-width: 200px; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; flex: none; display: grid; place-items: center; color: #fff; font-weight: 700; }
+  .acct a { color: var(--text); font-weight: 600; text-decoration: none; }
+  .acct a:hover { color: var(--accent); text-decoration: underline; }
+  .sub { color: var(--muted); font-size: 12px; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tag { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--line); }
+  .tag.new { background: var(--accent-soft); color: var(--accent); }
+  .tag.sent { background: var(--good-soft); color: var(--good); }
+  .tag.failed { background: var(--bad-soft); color: var(--bad); }
+  .tag.skipped { background: var(--warn-soft); color: var(--warn); }
+  .empty { text-align: center; color: var(--muted); padding: 50px 10px; }
+  details summary { cursor: pointer; font-weight: 600; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
+  .check { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 13px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">IG</div>
+  <h1>Instagram Outreach</h1>
+  <span class="pill" id="conn">Checking…</span>
+  <button class="btn ghost small" id="login" hidden>Connect Instagram</button>
+</header>
+<main>
+  <div class="stack">
+    <div class="card">
+      <h2>1 · Find leads</h2>
+      <label>Business niches (no website → website pitch)</label>
+      <div class="chips" id="niches"><input placeholder="Type and press Enter"></div>
+      <label>Agency niches (outsourcing pitch)</label>
+      <div class="chips" id="agency_niches"><input placeholder="e.g. marketing agency"></div>
+      <label>Country</label>
+      <select id="country"></select>
+      <label>City or area</label>
+      <div class="sugg" id="cities"></div>
+      <div class="row" style="margin-top:8px">
+        <input type="text" id="city" placeholder="Other city or area, then Enter">
+        <button class="btn ghost" id="addCity">Add</button>
+      </div>
+      <label>Selected locations</label>
+      <div class="chips" id="locations"></div>
+      <div class="hint">Every niche is searched in every selected location. Only accounts without a website are kept.</div>
+      <button class="btn wide" id="find">Find leads</button>
+    </div>
+
+    <div class="card">
+      <h2>2 · Send messages</h2>
+      <div class="row">
+        <input type="number" id="limit" min="1" placeholder="How many (blank = daily limit)">
+        <button class="btn" id="send">Send</button>
+      </div>
+      <div class="hint" id="sendhint"></div>
+      <div class="check">
+        <input type="checkbox" id="auto">
+        <span>Autopilot: every day from</span>
+        <input type="number" id="autoHour" min="0" max="23" style="width:64px">
+        <span>:00</span>
+      </div>
+      <div class="hint">Finds new leads when the list runs low and sends the day's messages by itself. Works only while this dashboard is running.</div>
+      <button class="btn ghost wide" id="previewBtn">Preview a message</button>
+      <div class="preview" id="preview" hidden></div>
+    </div>
+
+    <div class="card">
+      <div class="jobhead">
+        <div class="spin" id="spin" hidden></div>
+        <span id="jobname">Idle</span>
+        <button class="btn danger small" id="stop" hidden>Stop</button>
+      </div>
+      <pre id="log">Activity will show here.</pre>
+    </div>
+
+    <details class="card">
+      <summary>Settings</summary>
+      <label>Your name (message sign-off)</label>
+      <input type="text" id="sender">
+      <div class="grid2">
+        <div><label>Daily DM limit</label><input type="number" id="daily" min="1"></div>
+        <div><label>Min posts</label><input type="number" id="minposts" min="0"></div>
+        <div><label>Min followers</label><input type="number" id="minf" min="0"></div>
+        <div><label>Max followers</label><input type="number" id="maxf" min="0"></div>
+        <div><label>Min gap between DMs (sec)</label><input type="number" id="gapLo" min="20"></div>
+        <div><label>Max gap between DMs (sec)</label><input type="number" id="gapHi" min="20"></div>
+      </div>
+      <div class="check"><input type="checkbox" id="bizonly"><span>Only business / creator accounts</span></div>
+      <label>Message templates: businesses without a website</label>
+      <textarea id="templates"></textarea>
+      <label>Message templates: agencies (outsourcing pitch)</label>
+      <textarea id="agencyTemplates"></textarea>
+      <div class="hint">Separate templates with a line containing only <b>---</b>. Use <b>{a|b|c}</b> for random wording, <b>[name]</b> for the business name, <b>[niche]</b> and <b>[me]</b>.</div>
+      <button class="btn wide" id="save">Save settings</button>
+    </details>
+  </div>
+
+  <div>
+    <div class="stats" id="stats"></div>
+    <div class="card">
+      <div class="toolbar">
+        <div class="tabs" id="tabs"></div>
+        <select id="nicheFilter" title="Show one category"></select>
+        <input type="search" id="search" placeholder="Search leads">
+      </div>
+      <div class="bulk" id="bulk" hidden>
+        <b id="bulkCount"></b>
+        <button class="btn ghost small" id="bulkSkip">Skip</button>
+        <button class="btn ghost small" id="bulkRequeue">Re-queue</button>
+        <button class="btn danger small" id="bulkDelete">Delete</button>
+        <button class="btn ghost small" id="bulkClear">Clear selection</button>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th><input type="checkbox" id="selectAll" title="Select everything shown"></th><th>Account</th><th>Followers</th><th>Location</th><th>Links</th><th>Status</th><th></th></tr></thead>
+          <tbody id="leads"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="empty" hidden></div>
+    </div>
+  </div>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const post = (url, body) => fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body ?? {}) }).then((r) => r.json());
+function el(tag, props = {}, ...children) {
+  const node = Object.assign(document.createElement(tag), props);
+  node.append(...children);
+  return node;
+}
+
+const TABS = [["new", "Waiting"], ["sent", "Sent"], ["failed", "Failed"], ["skipped", "Skipped"], ["all", "All"]];
+const COLORS = ["#5b4bdb", "#e1306c", "#f9a03f", "#12805c", "#2b8fd6", "#b0429e", "#d9603b"];
+let state = null;
+let config = null;
+let tab = "new";
+let lastLeads = "";
+let lastLog = null;
+const selected = new Set();
+let visibleRows = [];
+
+function host(url) {
+  try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return url; }
+}
+
+// ---- targets (chips) ----
+function renderChips(key) {
+  const box = $(key);
+  const input = box.querySelector("input");
+  box.querySelectorAll(".chip").forEach((c) => c.remove());
+  for (const value of config[key]) {
+    const remove = el("button", { title: "Remove", onclick: () => { config[key] = config[key].filter((v) => v !== value); saveConfig(); renderChips(key); } }, "×");
+    box.insertBefore(el("span", { className: "chip" }, value, remove), input);
+  }
+}
+for (const key of ["niches", "agency_niches"]) {
+  const input = $(key).querySelector("input");
+  const add = () => {
+    const value = input.value.trim();
+    input.value = "";
+    if (!value || config[key].some((v) => v.toLowerCase() === value.toLowerCase())) return;
+    config[key].push(value);
+    saveConfig();
+    renderChips(key);
+  };
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === ",") { e.preventDefault(); add(); } });
+  input.addEventListener("blur", add);
+  $(key).addEventListener("click", () => input.focus());
+}
+
+// ---- locations: country, then city or area ----
+const COUNTRIES = {
+  "United Arab Emirates": ["Dubai", "Abu Dhabi", "Sharjah", "Ajman", "Al Ain", "Ras Al Khaimah", "Fujairah", "Umm Al Quwain"],
+  "Saudi Arabia": ["Riyadh", "Jeddah", "Mecca", "Medina", "Dammam", "Khobar", "Taif", "Tabuk", "Abha"],
+  "Qatar": ["Doha", "Al Rayyan", "Al Wakrah", "Lusail", "Al Khor"],
+  "Kuwait": ["Kuwait City", "Hawalli", "Salmiya", "Farwaniya", "Jahra"],
+  "Bahrain": ["Manama", "Riffa", "Muharraq", "Isa Town"],
+  "Oman": ["Muscat", "Salalah", "Sohar", "Nizwa", "Sur"],
+  "United Kingdom": ["London", "Manchester", "Birmingham", "Leeds", "Glasgow", "Liverpool", "Bristol", "Edinburgh", "Sheffield", "Leicester", "Bradford", "Cardiff"],
+  "Ireland": ["Dublin", "Cork", "Galway", "Limerick", "Waterford"],
+  "United States": ["New York", "Los Angeles", "Chicago", "Houston", "Miami", "Dallas", "Atlanta", "Phoenix", "San Diego", "Las Vegas", "Seattle", "Boston", "Austin", "Orlando"],
+  "Canada": ["Toronto", "Vancouver", "Montreal", "Calgary", "Edmonton", "Ottawa", "Mississauga", "Brampton", "Winnipeg"],
+  "Australia": ["Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide", "Gold Coast", "Canberra"],
+  "New Zealand": ["Auckland", "Wellington", "Christchurch", "Hamilton", "Tauranga"],
+  "Germany": ["Berlin", "Munich", "Hamburg", "Frankfurt", "Cologne", "Stuttgart", "Dusseldorf"],
+  "France": ["Paris", "Marseille", "Lyon", "Toulouse", "Nice", "Bordeaux"],
+  "Spain": ["Madrid", "Barcelona", "Valencia", "Seville", "Malaga", "Bilbao"],
+  "Italy": ["Rome", "Milan", "Naples", "Turin", "Florence", "Bologna"],
+  "Netherlands": ["Amsterdam", "Rotterdam", "The Hague", "Utrecht", "Eindhoven"],
+  "Sweden": ["Stockholm", "Gothenburg", "Malmo", "Uppsala"],
+  "Norway": ["Oslo", "Bergen", "Trondheim", "Stavanger"],
+  "Denmark": ["Copenhagen", "Aarhus", "Odense", "Aalborg"],
+  "Switzerland": ["Zurich", "Geneva", "Basel", "Bern", "Lausanne"],
+  "Austria": ["Vienna", "Salzburg", "Graz", "Innsbruck", "Linz"],
+  "Belgium": ["Brussels", "Antwerp", "Ghent", "Bruges", "Liege"],
+  "Singapore": ["Singapore"],
+};
+const sameLoc = (a, b) => a.city.toLowerCase() === b.city.toLowerCase() && a.country === b.country;
+
+function toggleLocation(loc) {
+  const had = config.locations.some((l) => sameLoc(l, loc));
+  config.locations = had ? config.locations.filter((l) => !sameLoc(l, loc)) : [...config.locations, loc];
+  saveConfig();
+  renderLocations();
+}
+
+function renderLocations() {
+  const country = $("country").value;
+  $("cities").replaceChildren(...COUNTRIES[country].map((city) => {
+    const loc = { country, city };
+    return el("button", { className: config.locations.some((l) => sameLoc(l, loc)) ? "on" : "", onclick: () => toggleLocation(loc) }, city);
+  }));
+  $("locations").replaceChildren(...config.locations.map((loc) =>
+    el("span", { className: "chip" }, [loc.city, loc.country].filter(Boolean).join(" · "),
+      el("button", { title: "Remove", onclick: () => toggleLocation(loc) }, "×"))));
+}
+
+function initLocations() {
+  $("country").replaceChildren(...Object.keys(COUNTRIES).sort().map((name) => el("option", { value: name }, name)));
+  const current = config.locations.map((l) => l.country).find((c) => COUNTRIES[c]);
+  $("country").value = current ?? "United Arab Emirates";
+  renderLocations();
+}
+$("country").onchange = renderLocations;
+function addCustomCity() {
+  const city = $("city").value.trim();
+  $("city").value = "";
+  const loc = { country: $("country").value, city };
+  if (city && !config.locations.some((l) => sameLoc(l, loc))) toggleLocation(loc);
+}
+$("addCity").onclick = addCustomCity;
+$("city").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); addCustomCity(); } });
+
+// ---- settings ----
+function fillSettings() {
+  $("sender").value = config.sender_name;
+  $("daily").value = config.send.daily_limit;
+  $("minf").value = config.filters.min_followers;
+  $("maxf").value = config.filters.max_followers;
+  $("minposts").value = config.filters.min_posts;
+  $("bizonly").checked = config.filters.business_only;
+  $("templates").value = config.templates.join("\n---\n");
+  $("agencyTemplates").value = config.agency_templates.join("\n---\n");
+  [$("gapLo").value, $("gapHi").value] = config.send.delay_between_dms_seconds;
+  config.autopilot ??= { enabled: false, hour: 10 };
+  $("auto").checked = config.autopilot.enabled;
+  $("autoHour").value = config.autopilot.hour;
+}
+$("auto").onchange = $("autoHour").onchange = () => {
+  config.autopilot = { enabled: $("auto").checked, hour: $("autoHour").value };
+  saveConfig();
+};
+function saveConfig() { return post("/api/config", config); }
+$("save").onclick = async () => {
+  config.sender_name = $("sender").value;
+  config.send.daily_limit = $("daily").value;
+  config.send.delay_between_dms_seconds = [$("gapLo").value, $("gapHi").value];
+  config.filters = { business_only: $("bizonly").checked, min_followers: $("minf").value, max_followers: $("maxf").value, min_posts: $("minposts").value };
+  const splitTemplates = (id) => $(id).value.split(/\n\s*---\s*\n/).map((t) => t.trim()).filter(Boolean);
+  config.templates = splitTemplates("templates");
+  config.agency_templates = splitTemplates("agencyTemplates");
+  await saveConfig();
+  config = null; // reload the validated values from the server
+  $("save").textContent = "Saved ✓";
+  setTimeout(() => ($("save").textContent = "Save settings"), 1500);
+  refresh();
+};
+
+// ---- leads ----
+function renderLeads() {
+  const term = $("search").value.trim().toLowerCase();
+  for (const username of [...selected]) if (!state.leads.some((l) => l.username === username)) selected.delete(username);
+  const niches = [...new Set(state.leads.map((l) => l.niche))].sort();
+  const picked = niches.includes($("nicheFilter").value) ? $("nicheFilter").value : "";
+  $("nicheFilter").replaceChildren(el("option", { value: "" }, "All categories"), ...niches.map((n) => el("option", { value: n }, n)));
+  $("nicheFilter").value = picked;
+  const rows = state.leads.filter((l) => (tab === "all" || l.status === tab) && (!picked || l.niche === picked) &&
+    (!term || [l.username, l.full_name, l.category, l.niche, l.location].join(" ").toLowerCase().includes(term)));
+  $("tabs").replaceChildren(...TABS.map(([key, label]) => {
+    const n = key === "all" ? state.leads.length : state.leads.filter((l) => l.status === key).length;
+    return el("button", { className: key === tab ? "on" : "", onclick: () => { tab = key; renderLeads(); } }, `${label} ${n}`);
+  }));
+  const pickBox = (items, title) => {
+    const box = el("input", { type: "checkbox", title, checked: items.every((l) => selected.has(l.username)) });
+    box.onchange = () => { for (const l of items) box.checked ? selected.add(l.username) : selected.delete(l.username); renderLeads(); };
+    return box;
+  };
+  const leadRow = (l) => {
+    const avatar = el("div", { className: "avatar" }, l.username[0].toUpperCase());
+    avatar.style.background = COLORS[l.username.length % COLORS.length];
+    const link = el("a", { href: `https://www.instagram.com/${l.username}/`, target: "_blank", rel: "noopener" }, "@" + l.username);
+    const account = el("div", { className: "acct" }, avatar,
+      el("div", {}, link, el("div", { className: "sub" }, [l.full_name, l.category].filter(Boolean).join(" · "))));
+    const links = (l.links || "").split(" ").filter(Boolean).map(host);
+    const status = el("td", {}, el("span", { className: "tag " + l.status }, l.status === "new" ? "waiting" : l.status));
+    if (l.status === "sent") status.append(el("div", { className: "sub", title: l.message || "" }, (l.sent_at || "").replace("T", " ").slice(0, 16)));
+    else if (l.note) status.append(el("div", { className: "sub", title: l.note }, l.note));
+    const action = el("td");
+    if (l.status !== "sent") {
+      const next = l.status === "new" ? "skipped" : "new";
+      action.append(el("button", { className: "btn ghost small", onclick: async () => { await post("/api/lead", { username: l.username, status: next }); refresh(); } },
+        l.status === "new" ? "Skip" : "Re-queue"));
+    }
+    return el("tr", {},
+      el("td", {}, pickBox([l], "Select")),
+      el("td", {}, account),
+      el("td", {}, Number(l.followers).toLocaleString()),
+      el("td", { title: l.location }, l.location.split(",")[0]),
+      el("td", {}, el("div", { className: "sub", title: links.join(", ") }, links.length ? [...new Set(links)].join(", ") : "no link")),
+      status, action);
+  };
+  // one section per category, each with a checkbox that selects the whole section
+  const sections = new Map();
+  for (const l of rows) sections.set(l.niche, [...(sections.get(l.niche) ?? []), l]);
+  $("leads").replaceChildren(...[...sections].flatMap(([niche, items]) => [
+    el("tr", { className: "group" }, el("td", {}, pickBox(items, "Select this whole category")),
+      el("td", { colSpan: 6 }, `${niche} · ${items.length} ${items.length === 1 ? "lead" : "leads"}${items[0].kind === "agency" ? " · outsourcing pitch" : ""}`)),
+    ...items.map(leadRow),
+  ]));
+  visibleRows = rows;
+  $("selectAll").checked = rows.length > 0 && rows.every((l) => selected.has(l.username));
+  $("bulk").hidden = selected.size === 0;
+  $("bulkCount").textContent = `${selected.size} selected`;
+  $("empty").hidden = rows.length > 0;
+  $("empty").textContent = state.leads.length ? "Nothing in this view." : "No leads yet. Add a niche and a location, then press Find leads.";
+}
+$("search").oninput = () => renderLeads();
+$("nicheFilter").onchange = () => renderLeads();
+$("selectAll").onchange = () => {
+  for (const l of visibleRows) $("selectAll").checked ? selected.add(l.username) : selected.delete(l.username);
+  renderLeads();
+};
+async function bulk(action) {
+  if (action === "delete" && !confirm(`Delete ${selected.size} leads? They will not come back in later searches.`)) return;
+  const result = await post("/api/leads", { usernames: [...selected], action });
+  if (result.error) return alert("Could not update the leads: " + result.error);
+  selected.clear();
+  await refresh();
+  renderLeads();
+}
+$("bulkSkip").onclick = () => bulk("skip");
+$("bulkRequeue").onclick = () => bulk("requeue");
+$("bulkDelete").onclick = () => bulk("delete");
+$("bulkClear").onclick = () => { selected.clear(); renderLeads(); };
+
+// ---- main refresh ----
+async function refresh() {
+  state = await (await fetch("/api/state")).json();
+  if (!config) { config = state.config; config.agency_niches ??= []; config.agency_templates ??= []; renderChips("niches"); renderChips("agency_niches"); initLocations(); fillSettings(); }
+  const cap = state.config.send.daily_limit;
+  const c = state.counts;
+
+  $("conn").textContent = state.connected ? "Instagram connected" : "Instagram not connected";
+  $("conn").className = "pill" + (state.connected ? " on" : "");
+  $("login").hidden = state.connected;
+
+  const sentBar = el("div", { className: "bar" }, el("i"));
+  sentBar.firstChild.style.width = Math.min(100, (state.sentToday / cap) * 100) + "%";
+  $("stats").replaceChildren(
+    el("div", { className: "card stat" }, el("b", {}, String(c.new || 0)), el("span", {}, "Waiting for a DM")),
+    el("div", { className: "card stat" }, el("b", {}, `${state.sentToday} / ${cap}`), el("span", {}, "Sent today"), sentBar),
+    el("div", { className: "card stat" }, el("b", {}, String(c.sent || 0)), el("span", {}, "Sent in total")),
+    el("div", { className: "card stat" }, el("b", {}, String(c.rejected || 0)), el("span", {}, "Checked, not a fit")));
+
+  const running = state.job.running;
+  for (const id of ["find", "send", "login"]) $(id).disabled = running;
+  $("spin").hidden = !running;
+  $("stop").hidden = !running;
+  const names = { find: "Finding leads", send: "Sending messages", login: "Connecting Instagram", auto: "Autopilot" };
+  const [gapLo, gapHi] = state.config.send.delay_between_dms_seconds.map((s) => +(s / 60).toFixed(1));
+  $("jobname").textContent = state.job.name ? (running ? names[state.job.name] + "…" : names[state.job.name] + " – finished") : "Idle";
+  $("sendhint").textContent = `${Math.max(cap - state.sentToday, 0)} sends left today. A random ${gapLo}–${gapHi} minute gap is kept between messages.`;
+  if (state.job.log !== lastLog && (state.job.log || lastLog !== null)) {
+    $("log").textContent = state.job.log || "Starting…";
+    $("log").scrollTop = $("log").scrollHeight;
+  }
+  lastLog = state.job.log;
+
+  const signature = JSON.stringify(state.leads);
+  if (signature !== lastLeads) { lastLeads = signature; renderLeads(); }
+}
+
+$("find").onclick = () => post("/api/run", { command: "find" }).then(refresh);
+$("send").onclick = () => post("/api/run", { command: "send", limit: $("limit").value }).then(refresh);
+$("login").onclick = () => post("/api/run", { command: "login" }).then(refresh);
+$("stop").onclick = () => post("/api/stop").then(refresh);
+$("previewBtn").onclick = async () => {
+  const lead = state.leads.find((l) => l.status === "new");
+  const { text } = await post("/api/preview", { username: lead?.username });
+  $("preview").hidden = false;
+  $("preview").textContent = (lead ? `To @${lead.username}:\n\n` : "Example:\n\n") + text;
+};
+
+refresh();
+setInterval(refresh, 2000);
+</script>
+</body>
+</html>

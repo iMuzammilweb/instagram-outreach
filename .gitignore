@@ -1,0 +1,9 @@
+node_modules/
+
+# Instagram login session and browser data (contains live cookies)
+browser_profile/
+session.json
+
+# Scraped leads database
+leads.db
+leads.db-*

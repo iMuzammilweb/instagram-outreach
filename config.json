@@ -1,0 +1,55 @@
+{
+  "niches": [
+    "car mechanics"
+  ],
+  "locations": [
+    {
+      "country": "United Arab Emirates",
+      "city": "Dubai"
+    }
+  ],
+  "sender_name": "Muzammil",
+  "filters": {
+    "business_only": false,
+    "min_followers": 300,
+    "max_followers": 50000,
+    "min_posts": 6
+  },
+  "find": {
+    "max_profiles_per_run": 600,
+    "search_pages": 6,
+    "deep_account_search": true,
+    "profile_delay_seconds": [
+      0.4,
+      1
+    ]
+  },
+  "send": {
+    "daily_limit": 200,
+    "delay_between_dms_seconds": [
+      90,
+      240
+    ],
+    "typing_delay_ms": [
+      40,
+      160
+    ]
+  },
+  "templates": [
+    "{Hi|Hey|Hello} [name]!\n\n{Came across|Just found|Stumbled on} your page {and really liked your work|and love what you're doing|and your posts look great}. {I noticed|Saw that} you don't have a website {yet|linked in your bio}.\n\n{I build simple, clean websites for small businesses|I make websites for businesses like yours} {so customers can find you on Google and reach you easily|so people can find you on Google, not just on Instagram}.\n\n{Would you be open to seeing a quick idea of how yours could look?|Can I send you a quick sample of what yours could look like?|Want me to share a couple of examples?} {No pressure at all|Totally fine if not} {🙂|😊|.}\n\n- [me]",
+    "{Hi|Hey} [name], {hope you're doing well|hope business is going great}!\n\n{I was looking at|I was going through} your page {and|, really nice work, and} {noticed there's no website|saw you don't have a website yet}.\n\n{That's what I do|I design websites for small businesses}, {simple, fast and affordable|nothing complicated, just a clean site that brings in more customers}.\n\n{Happy to show you a free mockup if you're interested|If you like, I can put together a free sample for you}. {Just let me know|Let me know what you think} {🙂|.}\n\n- [me]"
+  ],
+  "autopilot": {
+    "enabled": false,
+    "hour": 10,
+    "last_run": ""
+  },
+  "agency_niches": [
+    "website agency"
+  ],
+  "agency_templates": [
+    "{Hi|Hey|Hello} [name]!\n\n{I'm [me], a web designer and developer|My name is [me], I'm a web designer and developer}. {I've already built websites for quite a few businesses|I have built websites for a good number of businesses in different industries}.\n\n{If you ever have more work than your team can handle|Whenever your team is overloaded or a deadline is tight}, {you can outsource the work to me|I can take website projects off your plate}. {I do WordPress sites as well as fast custom vibe-coded websites|WordPress or custom vibe-coded builds, whichever fits the project}, {all white-label so the client stays yours|and everything is white-label}.\n\n{Happy to share my portfolio if you're open to it.|Can I send you a few of my recent projects?|Want to see some of my recent work?} {🙂|😊|}\n\n- [me]",
+    "{Hi|Hey} [name], {hope you're doing well|hope things are going great}!\n\n{I'm a freelance web designer and developer|I'm [me], a freelance web designer and developer} and {I've built websites for many businesses already|I've delivered websites for a lot of small businesses}.\n\n{I know agencies sometimes get more projects than they have time for|Agencies often need an extra pair of hands when work piles up}. {If you have any overflow work, you can outsource it to me|If that happens, I'd be glad to handle website projects for you}, {delivered on time under your brand|delivered under your name at a fair fixed price}.\n\n{I can also do vibe-coded websites when a client needs something quick and custom|For quick turnarounds I also build vibe-coded websites, so small projects can be done in days}.\n\n{Would you be open to a quick chat?|Should I send over some samples?|Open to seeing a few samples?} {🙂|😊|}\n\n- [me]",
+    "{Hi|Hey|Hello} [name]!\n\n{Quick question|Just a quick one}: {do you ever outsource website work?|does your team ever outsource web design or development?}\n\n{I'm [me], a web designer and developer|I'm a web designer and developer}, and {I've built websites for a lot of businesses|I've already done websites for many businesses}. {I work with WordPress and also build vibe-coded websites|I do both WordPress and vibe-coded websites}, {so I can fit whatever your client needs|depending on the budget and deadline}.\n\n{If you have extra projects or tight deadlines, I can help under your brand.|If you ever need extra hands, I'd be happy to help white-label.}\n\n{Can I send you some of my work?|Want to see a few samples?} {🙂|😊|}\n\n- [me]"
+  ]
+}
