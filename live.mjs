@@ -9,7 +9,6 @@ so the pages.dev site forwards to it (Cloudflare takes about a minute to pick th
 The address changes on every start, which is why it is pushed each time.
 */
 import { execFileSync, spawn } from "node:child_process";
-import { randomBytes } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
@@ -21,8 +20,8 @@ const TUNNEL_PATH = path.join(ROOT, "tunnel.json");
 const INSTALLED = "C:\\Program Files (x86)\\cloudflared\\cloudflared.exe";
 const CLOUDFLARED = existsSync(INSTALLED) ? INSTALLED : "cloudflared";
 
-if (!existsSync(PASSWORD_PATH)) writeFileSync(PASSWORD_PATH, randomBytes(15).toString("base64url") + "\n");
-const password = readFileSync(PASSWORD_PATH, "utf8").trim();
+// to lock the public address, put a password in a file named .ui-password and restart
+const password = existsSync(PASSWORD_PATH) ? readFileSync(PASSWORD_PATH, "utf8").trim() : "";
 
 const git = (...args) => execFileSync("git", args, { cwd: ROOT, stdio: "pipe" }).toString();
 
@@ -44,7 +43,8 @@ tunnel.stderr.on("data", (chunk) => {
   published = true;
   try {
     publish(url);
-    console.log(`\nLive in about a minute: ${SITE}\nUsername: anything    Password: ${password}\n`);
+    console.log(`\nLive in about a minute: ${SITE}`);
+    console.log(password ? `Username: anything    Password: ${password}\n` : "No password set: anyone with the address can use it.\n");
   } catch (err) {
     console.log(`\nCould not push the tunnel address to GitHub: ${String(err.stderr || err.message).trim()}`);
   }

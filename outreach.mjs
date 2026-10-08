@@ -658,15 +658,15 @@ async function cmdUi(args) {
     return { counts, leads, connected, sentToday: sentToday(db), config: CONFIG, job: { name, running, log } };
   }
 
-  // Anything that did not come straight from this PC's own browser (i.e. through the tunnel)
-  // must send the password from .ui-password. Without that file, remote access is refused.
+  // Optional lock: if a .ui-password file exists, anything that did not come straight from this
+  // PC's own browser (i.e. through the tunnel) must send that password. No file = open to anyone.
   const { timingSafeEqual } = await import("node:crypto");
   const passwordPath = path.join(ROOT, ".ui-password");
   function allowed(req) {
     const local = /^(localhost|127\.0\.0\.1)(:\d+)?$/.test(req.headers.host ?? "") &&
       !req.headers["cf-connecting-ip"] && !req.headers["x-forwarded-for"];
     if (local) return true;
-    if (!existsSync(passwordPath)) return false;
+    if (!existsSync(passwordPath)) return true;
     const expected = Buffer.from(readFileSync(passwordPath, "utf8").trim());
     const [scheme, encoded] = (req.headers.authorization ?? "").split(" ");
     const decoded = scheme === "Basic" ? Buffer.from(encoded ?? "", "base64").toString() : "";
