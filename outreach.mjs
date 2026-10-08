@@ -658,8 +658,28 @@ async function cmdUi(args) {
     return { counts, leads, connected, sentToday: sentToday(db), config: CONFIG, job: { name, running, log } };
   }
 
+  // Anything that did not come straight from this PC's own browser (i.e. through the tunnel)
+  // must send the password from .ui-password. Without that file, remote access is refused.
+  const { timingSafeEqual } = await import("node:crypto");
+  const passwordPath = path.join(ROOT, ".ui-password");
+  function allowed(req) {
+    const local = /^(localhost|127\.0\.0\.1)(:\d+)?$/.test(req.headers.host ?? "") &&
+      !req.headers["cf-connecting-ip"] && !req.headers["x-forwarded-for"];
+    if (local) return true;
+    if (!existsSync(passwordPath)) return false;
+    const expected = Buffer.from(readFileSync(passwordPath, "utf8").trim());
+    const [scheme, encoded] = (req.headers.authorization ?? "").split(" ");
+    const decoded = scheme === "Basic" ? Buffer.from(encoded ?? "", "base64").toString() : "";
+    const given = Buffer.from(decoded.slice(decoded.indexOf(":") + 1));
+    return expected.length > 0 && given.length === expected.length && timingSafeEqual(given, expected);
+  }
+
   const server = createServer(async (req, res) => {
     try {
+      if (!allowed(req)) {
+        res.writeHead(401, { "www-authenticate": 'Basic realm="Instagram Outreach"', "content-type": "text/plain" });
+        return res.end("Password required");
+      }
       if (req.method === "GET" && req.url === "/") {
         res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
         return res.end(readFileSync(path.join(ROOT, "ui.html")));

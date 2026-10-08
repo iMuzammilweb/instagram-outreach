@@ -4,6 +4,9 @@ node_modules/
 browser_profile/
 session.json
 
+# Password for reaching the dashboard through the pages.dev address
+.ui-password
+
 # Scraped leads database
 leads.db
 leads.db-*
